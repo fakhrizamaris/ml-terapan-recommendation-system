@@ -138,11 +138,65 @@ Visualisasi mencakup:
 3. Pembagian Data:
    - Train-test split dengan rasio 80:20
 
+### Data Preparation untuk Content-Based Filtering
+
+1. Feature Selection
+
+Dilakukan pemilihan fitur yang relevan untuk sistem rekomendasi opening catur
+Fokus pada kolom 'opening_archetype' sebagai fitur utama untuk analisis
+Kolom yang dipilih: 'opening_archetype', 'white_rating', 'black_rating', 'winner', dan 'increment_code'
+
+2. TF-IDF Vectorization
+
+Menggunakan TF-IDF (Term Frequency-Inverse Document Frequency) untuk mengubah teks opening menjadi representasi numerik
+TF-IDF membantu mengukur kepentingan setiap opening dalam dataset
+Proses:
+
+3. Mentransformasi teks opening menjadi vektor numerik
+
+Menghitung bobot kepentingan setiap kata dalam opening
+Menghasilkan matriks representasi fitur yang dapat digunakan untuk menghitung similaritas
+
+
+### Data Preparation untuk Collaborative Filtering
+
+1. Encoding Pengguna dan Opening
+
+   Mengubah ID pengguna dan nama opening menjadi representasi numerik
+Membuat dictionary mapping antara ID asli dan ID terkodekan
+Proses encoding memungkinkan model memproses data secara efisien
+
+2. Normalisasi Rating
+
+   Melakukan normalisasi 'times_used' ke skala 0-1
+Tujuan: Menyeragamkan rentang nilai untuk proses pelatihan model
+Rumus normalisasi: (x - min_rating) / (max_rating - min_rating)
+
+3. Pembagian Data Latih dan Validasi
+- Pembagian data dengan rasio 80:20
+- Menggunakan random sampling untuk memastikan distribusi data yang merata
+- Memisahkan data input (user dan opening) dengan target (rating)
+
 ## Modeling
 
-### 1. Content-Based Filtering
+###  Content-Based Filtering :  Cosine Similarity
 
-- Prinsip algoritma: Rekomendasi berbasis kesamaan konten
+Tahap Pembuatan Model:
+- Menggunakan TF-IDF Vectorization untuk mengubah teks opening menjadi vektor numerik
+- Menghitung Cosine Similarity antara vektor opening
+
+Cara Kerja Cosine Similarity:
+1. Mengukur kesamaan antara dua vektor berdasarkan sudut di antara mereka
+2. Nilai similarity berkisar antara 0-1
+3. Semakin dekat nilainya ke 1, semakin mirip kedua opening tersebut
+
+Proses Rekomendasi:
+
+- Identifikasi opening yang paling banyak digunakan
+- Temukan opening serupa menggunakan cosine similarity
+- Urutkan rekomendasi berdasarkan skor kesamaan
+
+- Prinsip algoritma: Rekomendasi berbasis kesamaan penggunaan
 - Teknik: TF-IDF Vectorization
 - Metode Similarity: Cosine Similarity
 ![download (4)](https://github.com/user-attachments/assets/45fb2bca-b422-44a1-bd93-62d99ffaddad)
@@ -154,28 +208,78 @@ Visualisasi mencakup:
   - Keterbatasan eksplorasi
   - Bergantung pada kualitas fitur
 
-### 2. Collaborative Filtering
+### Collaborative Filtering: Neural Network Recommender
+1. Arsitektur Model:
+   
+- Embedding Layer untuk User dan Opening
+- Dimensi Embedding: 50
+- Regularisasi L2: 1e-6
+- Activation Function: Sigmoid
 
+2. Hyperparameter Training:
+
+- Loss Function: Binary Crossentropy
+- Optimizer: Adam
+- Learning Rate: 0.001
+- Batch Size: 64
+- Epoch: 100
+
+3. Cara Kerja Model:
+
+- Belajar representasi embedding untuk user dan opening
+- Memprediksi rating/preferensi berdasarkan interaksi user-opening
+- Menghasilkan rekomendasi opening yang belum pernah dimainkan user
+
+### Top-N Rekomendasi
+Contoh Rekomendasi untuk User '--jim--':
+1. Content-Based Filtering:
+- Italian Game
+- Queen's Gambit
+- Sicilian Defense
+- French Defense
+- King's Indian Attack
+
+2. Collaborative Filtering:
+
+- Queen's Pawn Game
+- Sicilian Defense
+- King's Pawn Game
+- French Defense
+- Caro-Kann Defense
 - Prinsip algoritma: Rekomendasi berbasis pola kolektif
 - Model: Neural Network Recommender
 - Teknik: Embedding layer dengan bias
-- Kelebihan:
+
+Kelebihan:
   - Learning dari pola kolektif
   - Adaptif terhadap preferensi
-- Keterbatasan:
+
+Keterbatasan:
   - Cold start problem
   - Kompleksitas komputasi
 
 ## Evaluation
 
-### Perbandingan Model
+### Content-Based Filtering: Precision
+
+Precision dihitung berdasarkan:
+   - Jumlah opening relevan yang direkomendasikan
+   - Total jumlah opening yang direkomendasikan
+
+
+Rumus: Precision = (Jumlah Rekomendasi Relevan) / (Total Rekomendasi)
+
+### Collaborative Filtering: RMSE
+
+- RMSE Training: 0.23
+- RMSE Validasi: 0.25
+- Interpretasi: Model memiliki performa yang konsisten antara data latih dan validasi Nilai RMSE rendah menunjukkan prediksi yang akurat
 
 #### Content Based Filtering
 ![Content Based Filtering](https://github.com/user-attachments/assets/b59a5704-013c-4e76-8591-4628f648c0e0)
 
 #### Collaborative Filtering
 ![Screenshot 2025-01-23 093429](https://github.com/user-attachments/assets/0a12fdd4-8791-4aec-a0ea-e8b8c9770a69)
-
 
 
 ### Analisis Hasil
@@ -200,6 +304,31 @@ Visualisasi mencakup:
 2. Pelatihan ulang model secara berkala
 3. Eksplorasi fitur tambahan untuk peningkatan akurasi
 4. Pertimbangkan faktor eksternal seperti gaya bermain pemain
+
+### Dampak terhadap Business Understanding
+Problem Statements:
+
+1. Rekomendasi Personal ✓
+   - Kedua model menghasilkan rekomendasi berbasis preferensi individu
+
+2. Integrasi Preferensi dan Data Historis ✓
+   - Content-Based: Menggunakan karakteristik opening
+   - Collaborative Filtering: Memanfaatkan pola historis pemain
+
+3. Sistem Rekomendasi Adaptif (Rating 1500-2200) 
+   - Filter data sesuai rentang rating
+   - Model mampu memberikan rekomendasi spesifik
+
+Goals:
+1. Rekomendasi Personal 
+2. Dapat memberikan saran yang sesuai diharapkan 
+3. Strategi Opening Sesuai ECO (_Encyclopedia Chess Openings_) 
+
+Solusi Statement:
+
+1. Implementasi dual model berhasil
+2. Encoding dan normalisasi efektif
+3. RMSE rendah menunjukkan kualitas model
 
 ## Referensi
 
