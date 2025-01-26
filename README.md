@@ -29,7 +29,7 @@ Pada riset jurnal berjudul _"A Comprehensive Survey of Evaluation Techniques for
 2. Melakukan optimasi model dengan:
    - Encoding fitur pengguna dan opening
    - Normalisasi rating
-3. Menggunakan metrik RMSE untuk evaluasi model
+3. Menggunakan metrik precision dan RMSE untuk evaluasi model
 
 ## Data Understanding
 
@@ -82,24 +82,24 @@ Dataset berasal dari Kaggle: _Chess Game Dataset (Lichess)_ [[3]](https://www.ka
    - Deskripsi: jumlah langkah permainan catur
    
 10. moves:
-   - Tipe Data: object
-   - Deskripsi: pergerakan bidak catur
+      - Tipe Data: object
+      - Deskripsi: pergerakan bidak catur
 
 11. victory_status:
-   - Tipe Data: Object
-   - Deskripsi: Kode waktu pertandingan
+      - Tipe Data: Object
+      - Deskripsi: Kode waktu pertandingan
 
 12. opening_eco:
-   - Tipe Data: Object
-   - Deskripsi: _Encyclopaedia of Chess Openings_
+      - Tipe Data: Object
+      - Deskripsi: _Encyclopaedia of Chess Openings_
 
 13. opening_name:
-   - Tipe Data: Object
-   - Deskripsi: nama pembukaan catur
+      - Tipe Data: Object
+      - Deskripsi: nama pembukaan catur
 
 13. opening_ply:
-   - Tipe Data: Object
-   - Deskripsi: jumlah gerakan dalam pembukaan catur
+      - Tipe Data: Object
+      - Deskripsi: jumlah gerakan dalam pembukaan catur
 
 
 ## Exploratory Data Analysis (EDA)
@@ -107,16 +107,20 @@ Dataset berasal dari Kaggle: _Chess Game Dataset (Lichess)_ [[3]](https://www.ka
 #### Ringkasan Statistik
 
 - Rentang rating: 1500-2200
-- Jumlah unique opening: Teridentifikasi dalam analisis
+- Jumlah unique opening: 136 opening
 
 #### Analisis Tren Data
 
 Visualisasi mencakup:
-- Distribusi rating pemain
-![Distribusi rating pemain](https://github.com/user-attachments/assets/afb07d22-83ba-450c-b85f-8a10781b4986)
-- Top 20 Pembukaan yang paling sering di mainkan
-![top 20 openings](https://github.com/user-attachments/assets/d75b5d5e-298b-433a-a887-7479da0b4cf0)
-- Pola sebaran permainan
+   - Distribusi pemain dengan rating 1500-2200
+     
+     ![1500](https://github.com/user-attachments/assets/6de1cc0e-7138-4a14-98a7-73a6f65a11fe)
+
+   - Top 20 Pembukaan yang paling sering di mainkan
+     
+     ![top 20](https://github.com/user-attachments/assets/3627900f-dcad-49b8-8771-dec2a782c0f7)
+
+   - Pola sebaran permainan
 
 #### Analisis Korelasi
 
@@ -142,19 +146,19 @@ Visualisasi mencakup:
 
 1. Feature Selection
 
-Dilakukan pemilihan fitur yang relevan untuk sistem rekomendasi opening catur
+   Dilakukan pemilihan fitur yang relevan untuk sistem rekomendasi opening catur
 Fokus pada kolom 'opening_archetype' sebagai fitur utama untuk analisis
-Kolom yang dipilih: 'opening_archetype', 'white_rating', 'black_rating', 'winner', dan 'increment_code'
+Kolom yang dipilih: 'opening_archetype', 'id', dan 'times_used'.
 
 2. TF-IDF Vectorization
 
-Menggunakan TF-IDF (Term Frequency-Inverse Document Frequency) untuk mengubah teks opening menjadi representasi numerik
+   Menggunakan TF-IDF (Term Frequency-Inverse Document Frequency) untuk mengubah teks opening menjadi representasi numerik
 TF-IDF membantu mengukur kepentingan setiap opening dalam dataset
 Proses:
 
 3. Mentransformasi teks opening menjadi vektor numerik
 
-Menghitung bobot kepentingan setiap kata dalam opening
+   Menghitung bobot kepentingan setiap kata dalam opening
 Menghasilkan matriks representasi fitur yang dapat digunakan untuk menghitung similaritas
 
 
@@ -199,9 +203,11 @@ Proses Rekomendasi:
 - Prinsip algoritma: Rekomendasi berbasis kesamaan penggunaan
 - Teknik: TF-IDF Vectorization
 - Metode Similarity: Cosine Similarity
-![download (4)](https://github.com/user-attachments/assets/45fb2bca-b422-44a1-bd93-62d99ffaddad)
+  
+![cosine_similarity](https://github.com/user-attachments/assets/75d23c23-c0d0-4718-83f7-a2b528e4a438)
 
 - Kelebihan:
+
   - Personalisasi berdasarkan konten
   - Mudah diinterpretasi
 - Keterbatasan:
@@ -211,52 +217,41 @@ Proses Rekomendasi:
 ### Collaborative Filtering: Neural Network Recommender
 1. Arsitektur Model:
    
-- Embedding Layer untuk User dan Opening
-- Dimensi Embedding: 50
-- Regularisasi L2: 1e-6
-- Activation Function: Sigmoid
+   - Embedding Layer untuk User dan Opening
+   - Dimensi Embedding: 50
+   - Regularisasi L2: 1e-6
+   - Activation Function: Sigmoid
 
 2. Hyperparameter Training:
 
-- Loss Function: Binary Crossentropy
-- Optimizer: Adam
-- Learning Rate: 0.001
-- Batch Size: 64
-- Epoch: 100
+   - Loss Function: Binary Crossentropy
+   - Optimizer: Adam
+   - Learning Rate: 0.001
+   - Batch Size: 32
+   - Epoch: 100
 
 3. Cara Kerja Model:
 
-- Belajar representasi embedding untuk user dan opening
-- Memprediksi rating/preferensi berdasarkan interaksi user-opening
-- Menghasilkan rekomendasi opening yang belum pernah dimainkan user
+   - Belajar representasi embedding untuk user dan opening
+   - Memprediksi rating/preferensi berdasarkan interaksi user-opening
+   - Menghasilkan rekomendasi opening yang belum pernah dimainkan user
 
 ### Top-N Rekomendasi
-Contoh Rekomendasi untuk User '--jim--':
+Contoh Rekomendasi untuk User yesman81:
 1. Content-Based Filtering:
-- Italian Game
-- Queen's Gambit
-- Sicilian Defense
-- French Defense
-- King's Indian Attack
+   - Ruy Lopez
+   - French Defense
+   - Benoni Defense
+   - Slav Defense
+   - Gruenfeld Defense
 
 2. Collaborative Filtering:
+   - Sicilian Defense
+   - French Defense
+   - Mieses Opening
+   - Italian Game
+   - Queen's Pawn Game
 
-- Queen's Pawn Game
-- Sicilian Defense
-- King's Pawn Game
-- French Defense
-- Caro-Kann Defense
-- Prinsip algoritma: Rekomendasi berbasis pola kolektif
-- Model: Neural Network Recommender
-- Teknik: Embedding layer dengan bias
-
-Kelebihan:
-  - Learning dari pola kolektif
-  - Adaptif terhadap preferensi
-
-Keterbatasan:
-  - Cold start problem
-  - Kompleksitas komputasi
 
 ## Evaluation
 
@@ -266,20 +261,16 @@ Precision dihitung berdasarkan:
    - Jumlah opening relevan yang direkomendasikan
    - Total jumlah opening yang direkomendasikan
 
-
 Rumus: Precision = (Jumlah Rekomendasi Relevan) / (Total Rekomendasi)
+
+Hasil Precision = 0.4
 
 ### Collaborative Filtering: RMSE
 
-- RMSE Training: 0.23
-- RMSE Validasi: 0.25
-- Interpretasi: Model memiliki performa yang konsisten antara data latih dan validasi Nilai RMSE rendah menunjukkan prediksi yang akurat
-
-#### Content Based Filtering
-![Content Based Filtering](https://github.com/user-attachments/assets/b59a5704-013c-4e76-8591-4628f648c0e0)
-
-#### Collaborative Filtering
-![Screenshot 2025-01-23 093429](https://github.com/user-attachments/assets/0a12fdd4-8791-4aec-a0ea-e8b8c9770a69)
+- Validation Loss: 0.2441
+- Validation RMSE: 0.2261
+- Loss: 0.0602
+- RMSE: 0.0463
 
 
 ### Analisis Hasil
@@ -303,15 +294,15 @@ Rumus: Precision = (Jumlah Rekomendasi Relevan) / (Total Rekomendasi)
 1. Menggunakan kombinasi kedua model untuk rekomendasi komprehensif
 2. Pelatihan ulang model secara berkala
 3. Eksplorasi fitur tambahan untuk peningkatan akurasi
-4. Pertimbangkan faktor eksternal seperti gaya bermain pemain
+4. Pertimbangkan faktor eksternal seperti opening selain yang pernah dimainkan
 
 ### Dampak terhadap Business Understanding
 Problem Statements:
 
-1. Rekomendasi Personal ✓
+1. Rekomendasi Personal 
    - Kedua model menghasilkan rekomendasi berbasis preferensi individu
 
-2. Integrasi Preferensi dan Data Historis ✓
+2. Integrasi Preferensi dan Data Historis 
    - Content-Based: Menggunakan karakteristik opening
    - Collaborative Filtering: Memanfaatkan pola historis pemain
 
@@ -320,7 +311,7 @@ Problem Statements:
    - Model mampu memberikan rekomendasi spesifik
 
 Goals:
-1. Rekomendasi Personal 
+1. Rekomendasi yang ditujukan untuk personal
 2. Dapat memberikan saran yang sesuai diharapkan 
 3. Strategi Opening Sesuai ECO (_Encyclopedia Chess Openings_) 
 
