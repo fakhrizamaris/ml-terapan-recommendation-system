@@ -130,17 +130,10 @@ Visualisasi mencakup:
 
 ## Data Preparation
 
-1. Pembersihan Data:
+Pembersihan Data:
    - Hapus duplikasi
    - Filter rentang rating 1500-2200
 
-2. Transformasi Fitur:
-   - Encoding user dan opening
-   - Normalisasi rating
-   - Ekstraksi fitur opening
-
-3. Pembagian Data:
-   - Train-test split dengan rasio 80:20
 
 ### Data Preparation untuk Content-Based Filtering
 
